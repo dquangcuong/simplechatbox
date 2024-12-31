@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chó là bạn không phải mình</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #e0bbff;
+        }
+
+        .logo {
+            margin-bottom: 20px;
+        }
+
+        .logo img {
+            width: 150px;
+            height: auto;
+        }
+
+        .chat-container {
+            width: 90%;
+            max-width: 600px;
+            height: 70%;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(128, 0, 128, 0.5);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 2px solid #800080;
+        }
+
+        .chat-window {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f8e8ff;
+            border-bottom: 2px solid #800080;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-window .message {
+            margin: 10px 0;
+            padding: 8px 12px;
+            border-radius: 12px;
+            max-width: 70%;
+            word-wrap: break-word;
+            display: inline-block;
+            position: relative;
+        }
+
+        .chat-window .user {
+            align-self: flex-end;
+            background-color: #d8b4ff;
+            color: #4b0082;
+        }
+
+        .chat-window .user::after {
+            content: attr(data-time);
+            font-size: 12px;
+            color: #6a0080;
+            display: block;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .chat-window .bot {
+            align-self: flex-start;
+            background-color: #c1a1ff;
+            color: #2e0854;
+        }
+
+        .chat-window .bot::after {
+            content: attr(data-time);
+            font-size: 12px;
+            color: #4a0068;
+            display: block;
+            text-align: left;
+            margin-top: 5px;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            background-color: #e9d8ff;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #800080;
+            border-radius: 8px;
+            outline: none;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .chat-input button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: #800080;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .chat-input button:hover {
+            background-color: #5d005d;
+        }
+
+        .audio-container {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .audio-container .play-icon {
+            font-size: 24px;
+            cursor: pointer;
+            color: #800080;
+            transition: color 0.3s;
+        }
+
+        .audio-container .play-icon:hover {
+            color: #5d005d;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="logo">
+        <img src="OIP.png" alt="TalkwithDog Logo">
+    </div>
+    <div class="chat-container">
+        <div class="chat-window" id="chatWindow"></div>
+        <div class="chat-input">
+            <input type="text" id="userInput" placeholder="Nhập tin nhắn...">
+            <button onclick="sendMessage()">Gửi</button>
+        </div>
+    </div>
+
+    <script>
+        const chatWindow = document.getElementById('chatWindow');
+        const userInput = document.getElementById('userInput');
+
+        function sendMessage() {
+            const userMessage = userInput.value.trim();
+            if (userMessage === '') return;
+
+            const timeNow = new Date().toLocaleTimeString('vi-VN', { hour12: false });
+
+            // Add user message
+            addMessage(userMessage, 'user', timeNow);
+
+            setTimeout(() => {
+                const botMessage = generateBotReply();
+                const botTime = new Date().toLocaleTimeString('vi-VN', { hour12: false });
+                addMessage(botMessage.text, 'bot', botTime, botMessage.audio);
+            }, 500);
+
+            userInput.value = '';
+        }
+
+        function addMessage(message, sender, time, audioPath) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender);
+            messageElement.setAttribute('data-time', time);
+
+            // Create message content
+            const messageContent = document.createElement('span');
+            messageContent.textContent = message;
+            messageElement.appendChild(messageContent);
+
+            if (audioPath) {
+                // Add the play icon within the bot's message
+                const audioContainer = document.createElement('div');
+                audioContainer.classList.add('audio-container');
+                const playIcon = document.createElement('i');
+                playIcon.classList.add('fas', 'fa-play', 'play-icon');
+                playIcon.onclick = function () {
+                    playAudio(audioPath);
+                };
+                audioContainer.appendChild(playIcon);
+                messageElement.appendChild(audioContainer);
+            }
+
+            chatWindow.appendChild(messageElement);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function generateBotReply() {
+            if (Math.random() < 0.4) {  
+                const audioNumber = Math.floor(Math.random() * 10) + 1;  
+                return {
+                    text: '',
+                    audio: `sounds/sua${audioNumber}.mp3`
+                };
+            } else {
+                const numberOfGaus = Math.floor(Math.random() * 8) + 2;
+                let reply = 'gâu '.repeat(numberOfGaus).trim();
+
+                if (Math.random() < 0.3) {
+                    reply += ' oảng';
+                }
+
+                if (Math.random() < 0.5) {
+                    reply += '!';
+                }
+
+                return { text: reply, audio: null };
+            }
+        }
+
+        function playAudio(audioPath) {
+            const audioPlayer = new Audio(audioPath);
+            audioPlayer.play();
+        }
+    </script>
+</body>
+
+</html>
