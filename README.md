@@ -1,1 +1,1 @@
-https://dquangcuong.github.io/chatbox/
+https://dquangcuong.github.io/simplechatbox/
